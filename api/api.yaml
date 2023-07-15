@@ -5,8 +5,6 @@ info:
   description: |
     # Greenbone computer management API
     An API to keep track of the computers issued by the company.
-servers:
-  - url: 'http://localhost:3000'
 components:
   schemas:
     ServiceErrorResponse:
@@ -20,9 +18,9 @@ components:
           description: |
             The name of the error.
         code:
-          type: string
+          type: integer
           description: |
-            The error code.
+            The status error code.
         details:
           type: string
           description: |
@@ -91,6 +89,31 @@ components:
             $ref: '#/components/schemas/ComputerDto'
       required:
         - computers
+    UpdateComputerRequest:
+      type: object
+      additionalProperties: false
+      description: |
+        Data needed to update an computer
+      properties:
+        mac:
+          type: string
+          description: |
+            The MAC address of the computer within the company network.
+        ip:
+          type: string
+          format: ipv4
+          description: |
+            The IP V4 address of the computer within the company network.
+        assignedEmployee:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: |
+            The abbrevation of the employee assigned to the computer. The employee abbreviation consists of 3 letters. For example Max Mustermann should be mmu.
+        description:
+          type: string
+          description: |
+            Additional information about the computer.
 paths:
   /v1/computers:
     get:
@@ -112,6 +135,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ServiceErrorResponse'
+      tags:
+        - Computers
     post:
       operationId: createComputer
       summary: Create data source
@@ -135,7 +160,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ServiceErrorResponse'
+      tags:
+        - Computers
   /v1/computers/{computerName}:
+      get:
+        operationId: getComputer
+        summary: Get computer
+        description: |
+          Get data of a specific computer
+        responses:
+          '200':
+            description: |
+              Fetched computer.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ComputerDto'
+          '404':
+            description: NotFound
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ServiceErrorResponse'
+          '500':
+            description: InternalServerError
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ServiceErrorResponse'
+        parameters:
+          - in: path
+            name: computerName
+            description: |
+              The name of the computer to be updated.
+            required: true
+            schema:
+              type: string
+        tags:
+          - Computers
       patch:
         operationId: updateComputer
         summary: Update computer data
@@ -145,7 +207,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ComputerDto'
+                $ref: '#/components/schemas/UpdateComputerRequest'
         responses:
           '200':
             description: Ok
@@ -173,6 +235,8 @@ paths:
             required: true
             schema:
               type: string
+        tags:
+          - Computers
       delete:
         operationId: deleteComputer
         summary: Delete computer
@@ -201,3 +265,41 @@ paths:
             required: true
             schema:
               type: string
+        tags:
+          - Computers
+  /v1/computers/employee/{assignedEmployee}:
+    get:
+      operationId: getComputersByEmployee
+      summary: Get computers by employee
+      description: |
+        Get data of computers assigned to an employee.
+      responses:
+        '200':
+          description: |
+            Fetched computer.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetComputersResponse'
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceErrorResponse'
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceErrorResponse'
+      parameters:
+        - in: path
+          name: assignedEmployee
+          description: |
+            The employee abbrevation.
+          required: true
+          schema:
+            type: string
+      tags:
+        - Computers

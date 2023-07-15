@@ -10,5 +10,5 @@ func main() {
 	logger, _ := zap.NewProduction()
 	defer logger.Sync()
 
-	api.Run(logger, "")
+	api.Run(logger, ".")
 }
