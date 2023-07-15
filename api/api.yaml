@@ -1,0 +1,203 @@
+openapi: 3.0.3
+info:
+  title: Greenbone computer management API
+  version: 1.0.0
+  description: |
+    # Greenbone computer management API
+    An API to keep track of the computers issued by the company.
+servers:
+  - url: 'http://localhost:3000'
+components:
+  schemas:
+    ServiceErrorResponse:
+      type: object
+      additionalProperties: false
+      description: |
+        This schema represents the default response in case of an API call resulting in an error.
+      properties:
+        name:
+          type: string
+          description: |
+            The name of the error.
+        code:
+          type: string
+          description: |
+            The error code.
+        details:
+          type: string
+          description: |
+            An optional string of explanatatory details about the occured errors.
+      required:
+        - name
+        - code
+    ComputerDto:
+      type: object
+      additionalProperties: false
+      description: |
+        An object that describes required information about a computer.
+      properties:
+        name:
+          type: string
+          description: |
+            The internal name of the computer.
+        mac:
+          type: string
+          description: |
+            The MAC address of the computer within the company network.
+        ip:
+          type: string
+          format: ipv4
+          description: |
+            The IP V4 address of the computer within the company network.
+        assignedEmployee:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: |
+            The abbrevation of the employee assigned to the computer. The employee abbreviation consists of 3 letters. For example Max Mustermann should be mmu.
+        description:
+          type: string
+          description: |
+            Additional information about the computer.
+      required:
+        - name
+        - mac
+        - ip
+    GetComputersResponse:
+      type: object
+      additionalProperties: false
+      description: |
+        An list of object that describes computers used in the company.
+      properties:
+        computers:
+          type: array
+          description: |
+            A list of assigned computers.
+          items:
+            $ref: '#/components/schemas/ComputerDto'
+      required:
+        - computers
+    CreateComputerRequest:
+      type: object
+      additionalProperties: false
+      description: |
+        Data needed to create an computer
+      properties:
+        computers:
+          type: array
+          description: |
+            A list of assigned computers.
+          items:
+            $ref: '#/components/schemas/ComputerDto'
+      required:
+        - computers
+paths:
+  /v1/computers:
+    get:
+      operationId: getComputers
+      summary: List all computers
+      description: |
+        Fetches a list of company registered computers
+      responses:
+        '200':
+          description: |
+            Fetched list of registered computers.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetComputersResponse'
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceErrorResponse'
+    post:
+      operationId: createComputer
+      summary: Create data source
+      description: |
+          Creates a new data source.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComputerDto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComputerDto'
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceErrorResponse'
+  /v1/computers/{computerName}:
+      patch:
+        operationId: updateComputer
+        summary: Update computer data
+        description: |
+          Updates the computer data of an existing computer.
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComputerDto'
+        responses:
+          '200':
+            description: Ok
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ComputerDto'
+          '400':
+            description: BadRequest
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ServiceErrorResponse'
+          '404':
+            description: NotFound
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ServiceErrorResponse'
+        parameters:
+          - in: path
+            name: computerName
+            description: |
+              The name of the computer to be updated.
+            required: true
+            schema:
+              type: string
+      delete:
+        operationId: deleteComputer
+        summary: Delete computer
+        description: |
+          Removes a computer from the list.
+        responses:
+          '204':
+            description: Deleted
+          '400':
+            description: BadRequest
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ServiceErrorResponse'
+          '404':
+            description: NotFound
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ServiceErrorResponse'
+        parameters:
+          - in: path
+            name: computerName
+            description: |
+              The name of the computer to be removed.
+            required: true
+            schema:
+              type: string
