@@ -13,5 +13,5 @@ test-integration:
 	go test -v ./test/api/...
 
 codegen:
-	oapi-codegen -generate types,spec -package models api/api.yaml > internal/api/models/models.gen.go
-	oapi-codegen -generate gin -package services api/api.yaml > internal/api/services/service.gen.go
+	oapi-codegen -generate types,spec -package models definition/api.yaml > internal/api/models/models.gen.go
+	oapi-codegen -generate gin -package services definition/api.yaml > internal/api/services/service.gen.go
