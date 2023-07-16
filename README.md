@@ -1,5 +1,12 @@
 # greenbone-task
-A little coding challenge in go
+
+A little coding challenge in go. 
+
+## Approach
+
+While designing the solution for this, I wanted to follow entirely the API first approach which aims to first design 
+the API specification using the OpenAPI standard and use this as source of truth for generating the models and handlers 
+for the service. The reasoning behind this approach are nicely explained [here](https://medium.com/@bhanu.pratap/embracing-the-api-first-approach-development-practices-and-tools-for-efficient-product-development-6f0f0cc73049).
 
 ## How to use this
 
@@ -41,9 +48,14 @@ make test
 
 ## Limitations
 
-* no tests
+Due to time constraints, several tasks which I consider production ready
+have been skipped for this task. Therefor the following items are missing in this solution:
+
+* no tests (unit/integration/e2e)
 * no auth for API
 * improvable structure
+* no docker build
+* no CI/CD pipeline setup
 
 ## Frameworks and tools
 
